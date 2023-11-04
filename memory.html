@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <title>Title</title>
+    <style>
+      .buttons {
+        overflow: hidden;
+        width: 20vw;
+        height: 20vw;
+        border-radius: 10px;
+  		box-shadow: 0px 0px 10px white inset;
+        border: 1px solid;
+        border-color: white;
+        transform: perspective(1500px) rotateX(20deg) rotateY(20deg);
+        transition: box-shadow 1s, transform .5s cubic-bezier(.65,1.78,.58,.88);
+        span {
+          z-index: 20;
+        }
+        &:after {
+          background: #fff;
+          content: "";
+          height: 155px;
+          left: -75px;
+          opacity: .2;
+          position: absolute;
+          top: -50px;
+          transform: rotate(35deg);
+          transition: all 550ms cubic-bezier(0.19, 1, 0.22, 1);
+          width: 50px;
+          z-index: -10;
+        }
+      }
+      .buttons:hover {
+        box-shadow: 0px 0px 100px rgba(100, 100, 100, 0.2) inset;
+        cursor: pointer;
+        transform: perspective(200px) rotateX(5deg) rotateY(5deg);
+        &:after {
+          left: 120%;
+          transition: all 550ms cubic-bezier(0.19, 1, 0.22, 1);
+        }
+      }
+      #redbutton {
+        margin: auto 0 auto auto;
+        background-color: red;
+      }
+      #bluebutton {
+        margin: auto;
+        background-color: blue;
+      }
+      #yellowbutton {
+        margin: auto;
+        background-color: yellow;
+      }
+      #greenbutton {
+        margin: auto auto auto 0;
+        background-color: green;
+      }
+      @-webkit-keyframes bg-scrolling-reverse {
+        100% {
+          background-position: 50px 50px;
+        }
+      }
+      @keyframes bg-scrolling-reverse {
+        100% {
+          background-position: 50px 50px;
+        }
+      }
+      @-webkit-keyframes bg-scrolling {
+        0% {
+          background-position: 50px 50px;
+        }
+      }
+      @keyframes bg-scrolling {
+        0% {
+          background-position: 50px 50px;
+        }
+      }
+      body {
+        color: #999;
+        font: 400 16px/1.5 exo, ubuntu, "segoe ui", helvetica, arial, sans-serif;
+        text-align: center;
+        background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAIAAACRXR/mAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAIGNIUk0AAHolAACAgwAA+f8AAIDpAAB1MAAA6mAAADqYAAAXb5JfxUYAAABnSURBVHja7M5RDYAwDEXRDgmvEocnlrQS2SwUFST9uEfBGWs9c97nbGtDcquqiKhOImLs/UpuzVzWEi1atGjRokWLFi1atGjRokWLFi1atGjRokWLFi1af7Ukz8xWp8z8AAAA//8DAJ4LoEAAlL1nAAAAAElFTkSuQmCC") repeat 0 0;
+        -webkit-animation: bg-scrolling-reverse 0.92s infinite;
+        animation: bg-scrolling-reverse 0.92s infinite;
+        -webkit-animation-timing-function: linear;
+        animation-timing-function: linear;
+      }
+      .overlay {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(5px);
+        transition: opacity 500ms;
+        visibility: visible;
+        opacity: 1;
+      }
+      .popup {
+        background-color: white;
+        width: 50vw;
+        margin-left: 25vw;
+        border-radius: 25px;
+      }
+    </style>
+  </head>
+  <body style="background-color: rgb(240,240,240)">
+    <section style="margin-bottom: 9rem; margin-top; .5rem; font-family: Tahoma, Arial, sans-serif; font-size: 40px; font-weight: bold;">A MEMORY GAME THAT HURTS YOUR BRAIN</section>
+    <div>
+      <button id="startbutton" onclick="startpressed()" style="width:10vw;background-color:black;font-weight:bold;color:white;border:none;margin-bottom:1rem;cursor:pointer;border-radius:5px;height:3rem;">
+        START
+      </button>
+    </div>
+    <div style="width:100%; align:center; height: auto;">
+      <button onClick="colorButton('Red')" id="redbutton" class="buttons"><span></span></button>
+      <button onClick="colorButton('Blue')" id="bluebutton" class="buttons"><span></span></button>
+      <button onClick="colorButton('Yellow')" id="yellowbutton" class="buttons"><span></span></button>
+      <button onClick="colorButton('Green')" id="greenbutton" class="buttons"><span></span></button>
+    </div>
+    <section id="displaybox" style="user-select:none;font-size:100px;font-weight:bold;-webkit-text-stroke-width: 1px;-webkit-text-stroke-color: white;overflow:none;margin-top: 4vh; height: 22vh; background:rgba(50,50,50,0.8); backdrop-filter: blur(3px); border-radius: 20px;">
+    </section>
+    <div id="popup1" class="overlay">
+        <div class="popup">
+            <h2 id="header2" style="color:white;margin-top:30vh;-webkit-text-stroke-width: 1px;-webkit-text-stroke-color: black;">How To Play:</h2>
+            <div id="content" class="content" style="width:50%;margin-left:25%;color:black;font-size:18px;">
+                Memorize the sequence as it gets longer and repeat it back by pressing the colors in the correct order. 
+            </div>
+          	<button id="close" class="close" style="background-color:black;color:white;border:none;margin-top:2vh;cursor:pointer;border-radius:5px;" onclick="document.getElementById('popup1').style.display = 'none'; closebuttonpress()">x</button>
+        </div>
+    </div>
+    <script>
+      var started = false
+      var currentlydisplaying = true
+      let xmax = 1
+      let xcurrent = 0
+      let colorarray = ['Red','Blue','Yellow','Green']
+      let colorarraymemory = []
+      let displaybox = document.getElementById("displaybox");
+      function startpressed() {
+        let popup1 = document.getElementById("popup1");
+        popup1.style.display = "inline";
+        document.getElementById("startbutton").style.display = "none";
+        document.getElementById("content").innerText = 'Memorize the word, not the color of the word!'
+        document.getElementById("close").innerText = 'Got it.'
+        document.getElementById("header2").innerText = 'Make Sure To:'
+        started = true
+      }
+      function loop(x,mstime){
+        setTimeout(function(){
+          if (x==xmax-1) {
+            displaybox.innerText=' '
+            currentlydisplaying = false
+          } else {
+            setTimeout(function(){
+              displaybox.innerText=' '
+            },800)
+            colorarraymemory.push(colorarray[Math.floor(Math.random()*colorarray.length)]);
+            displaybox.innerText = colorarraymemory[x]
+            displaybox.style.color = colorarray[Math.floor(Math.random()*colorarray.length)];
+          }
+        }, mstime * x);
+      }
+      function closebuttonpress() {
+        if (started===true) {
+          currentlydisplaying = true
+          xcurrent=0
+          document.getElementById("popup1").style.display = 'none';
+          let i=0
+          while (i<(xmax+1)) {
+            loop(i,1000);
+            i++;
+          }
+          xmax++;
+        }
+      }
+      ar1 = []
+      function colorButton(colorPressed) {
+        if (!currentlydisplaying) {
+          if (colorarraymemory[xcurrent]==colorPressed) {
+            console.log('correct')
+            xcurrent++
+            let colorbrick = document.createElement('div');
+            colorbrick.style.display = 'inline-block'
+            colorbrick.style.backgroundColor = colorPressed
+            colorbrick.style.width = "30px"
+            colorbrick.style.height = "30px"
+            colorbrick.style.margin = "5px"
+            colorbrick.style.borderRadius = "10%"
+            colorbrick.style.border = "1px solid"
+            colorbrick.style.borderColor = "white"
+            colorbrick.style.transform = "perspective(1500px) rotateX(20deg) rotateY(20deg)"
+            displaybox.appendChild(colorbrick)
+            ar1.push(colorbrick)
+            if (xcurrent==xmax-1) {
+              ar1 = []
+              closebuttonpress()
+            }
+          } else {
+            console.log('incorrect')
+            currentlydisplaying=true
+            started=false
+            let popup1 = document.getElementById("popup1");
+            popup1.style.display = "inline";
+            document.getElementById("startbutton").style.display = 'none';
+            document.getElementById("content").innerHTML = '<h1>'+Math.round(((xmax-1)+((xcurrent)/(xmax-1)))*10)/10+'</h1>\n<b>Refresh page to try again!</b>'
+            document.getElementById("close").style.display = 'none'
+            document.getElementById("header2").innerText = 'SCORE:'
+          }
+        }
+      }
+    </script>
+  </body>
+</html>
